@@ -11,7 +11,7 @@ Le prototype validé `vigie-rh-prototype.html` (à la racine) fait référence p
 | 1 | Socle : schéma Prisma, seed de démo, layout, 3 thèmes clair/sombre | ✅ |
 | 2 | Écrans Signaux, Cartographie, fiche entreprise, pagination serveur | ✅ |
 | 3a | Mes données sans API : import CSV / Excel (exports HubSpot inclus), liste d'exclusion, saisie | ✅ |
-| 3b | Univers cible (Recherche d'entreprises), export pour l'import HubSpot | à venir |
+| 3b | Univers cible (Recherche d'entreprises), ajout par SIREN, export pour l'import HubSpot | ✅ |
 | 4 | Collecte Sirene, France Travail, actualités + classification Claude | à venir |
 | 5 | Score configurable, Priorités, Comptes suivis, badge « nouveaux » | à venir |
 | 6 | Export Excel des vues filtrées | à venir |
@@ -56,7 +56,8 @@ Le fichier `.env` n'est jamais commité (voir `.gitignore`).
 | `npm run db:purge-demo` | Supprime toutes les données de démo |
 | `npm run db:studio` | Explorateur de base Prisma Studio |
 | `npm run import -- --kind=entreprises\|contacts\|exclusions --file=…` | Import d'un fichier CSV / XLSX en ligne de commande (`--dry-run` : affiche la correspondance des colonnes ; `--no-create` : n'invente pas d'entreprise pour un contact orphelin) |
-| `npm run collect` | Collecte des sources (étape 4) |
+| `npm run collect -- --source=univers --limit=5` | Univers cible : test sur 5 entreprises (`--estimate` : compte seulement ; `--min=1000` ; `--public` pour inclure le public) |
+| `npm run collect -- --source=univers` | Univers cible complet (≥ 1 000 salariés, hors public par défaut) |
 | `npm test` | Tests unitaires (Vitest) |
 | `npm run typecheck` / `npm run lint` | Vérifications TypeScript et ESLint |
 
@@ -83,6 +84,22 @@ Page **Importer** (`/importer`) ou commande `npm run import`. Formats : CSV (sé
 **Saisie** depuis la fiche : « + Ajouter un contact », « Client signé » (exclut le compte ; réintégrable depuis le rail).
 
 Exemples fictifs de fichiers : `tests/fixtures/`.
+
+### Univers cible
+
+Carte « Univers cible » de `/importer` ou `npm run collect -- --source=univers`. Interroge l'API publique [Recherche d'entreprises](https://recherche-entreprises.api.gouv.fr) (sans clé) : entreprises actives, tranche d'effectif INSEE ≥ 1 000 salariés par défaut, une requête paginée par section NAF, secteur public écarté (catégories juridiques 4xxx / 7xxx, section O, services publics) sauf option contraire.
+
+- L'effectif enregistré est la **borne basse de la tranche INSEE** (ex. 1 000 pour « 1 000 à 1 999 ») ; un effectif précis venu de vos fichiers n'est jamais écrasé.
+- Une entreprise déjà importée sans SIREN (export HubSpot) est **complétée** si son nom normalisé correspond sans ambiguïté, au lieu d'être dupliquée.
+- La liste d'exclusion s'applique aux comptes créés.
+- **Premier essai conseillé** : `npm run collect -- --source=univers --estimate`, puis `--limit=5`, avant l'import complet (quelques minutes, débit limité à ~6 requêtes / s).
+
+Bouton **+ Ajouter** (Cartographie) : recherche par nom ou SIREN dans la même API, ou création manuelle sans SIREN.
+
+### Retour vers HubSpot (sans API)
+
+- **Export HubSpot** (Cartographie) : CSV des entreprises ou contacts de la vue filtrée, en-têtes reconnus par l'assistant d'import HubSpot (Company name, Company Domain Name, Number of Employees, First Name, Email, Job Title…) + colonnes Vigie RH (SIREN, score, derniers signaux) à associer à des propriétés personnalisées ou à ignorer. Données de démo exclues.
+- **Copier pour HubSpot** (fiche) : résumé daté des signaux et outils, à coller en note sur l'entreprise.
 
 ## Données de démo
 

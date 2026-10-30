@@ -9,9 +9,16 @@ import FilterRail from "@/components/FilterRail";
 import ViewHeader from "@/components/ViewHeader";
 import CompanyDrawer from "@/components/CompanyDrawer";
 import StarButton from "@/components/StarButton";
+import AddCompany from "@/components/AddCompany";
 import { CompanyLink, Pager, ScoreCell, SortTh, ToolsCell, structLine } from "@/components/ui";
 
 const PATH = "/cartographie";
+
+function HubspotExport({ f }: { f: Filters }) {
+  const q = toQuery(f, { page: 1, fiche: null, sort: null }).slice(1);
+  const type = f.carto === "contacts" ? "contacts" : "companies";
+  return <a className="btn" href={`/api/export/hubspot?type=${type}${q ? `&${q}` : ""}`} title="CSV prêt pour l'assistant d'import HubSpot (vos données, hors démo)">Export HubSpot</a>;
+}
 
 function Toggle({ f }: { f: Filters }) {
   const href = (carto: Filters["carto"]) => `${PATH}${toQuery(f, { carto, page: 1, sort: null, fiche: null })}`;
@@ -40,7 +47,7 @@ export default async function CartographiePage({ searchParams }: { searchParams:
       <div className="wrap">
         <FilterRail f={f} mode="contacts" excluded={excluded} />
         <main>
-          <ViewHeader title="Cartographie" sub={`${fmt(total)} contacts dans votre périmètre`} f={f}><Toggle f={f} /></ViewHeader>
+          <ViewHeader title="Cartographie" sub={`${fmt(total)} contacts dans votre périmètre`} f={f}><Toggle f={f} /><AddCompany /><HubspotExport f={f} /></ViewHeader>
           <div className="tablebox">
             <table>
               <thead><tr><SortTh f={f} path={PATH} k="name" label="Contact" /><th>Fonction</th><SortTh f={f} path={PATH} k="co" label="Entreprise" /><SortTh f={f} path={PATH} k="since" label="En poste depuis" /><th>E-mail</th><th>Source</th></tr></thead>
@@ -87,7 +94,7 @@ export default async function CartographiePage({ searchParams }: { searchParams:
     <div className="wrap">
       <FilterRail f={f} mode="comptes" excluded={excluded} />
       <main>
-        <ViewHeader title="Cartographie" sub={`${fmt(total)} entreprises dans votre périmètre`} f={f}><Toggle f={f} /></ViewHeader>
+        <ViewHeader title="Cartographie" sub={`${fmt(total)} entreprises dans votre périmètre`} f={f}><Toggle f={f} /><AddCompany /><HubspotExport f={f} /></ViewHeader>
         <div className="tablebox">
           <table>
             <thead><tr><th></th><SortTh f={f} path={PATH} k="name" label="Entreprise" /><SortTh f={f} path={PATH} k="eff" label="Effectif" /><th>Outils en place</th><th>Contacts</th><th>Groupe</th><SortTh f={f} path={PATH} k="score" label="Priorité" /><SortTh f={f} path={PATH} k="last" label="Dernier signal" /></tr></thead>

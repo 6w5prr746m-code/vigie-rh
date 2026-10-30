@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
-import { RIVALS, fnFamily } from "@/lib/referentiels";
+import { RIVALS, SIGNAL_TYPES, fnFamily, type SignalType } from "@/lib/referentiels";
 import { toQuery, type Filters } from "@/lib/filters";
 import { fmt, fmtDate, formatSiren } from "@/lib/format";
 import { Pill, structLine } from "./ui";
 import StarButton from "./StarButton";
-import { AddContactForm, CustomerButton, DrawerClose, ExcludeButton, HubspotButton, ToolFeedback } from "./DrawerClient";
+import { AddContactForm, CustomerButton, DrawerClose, ExcludeButton, CopyForHubspot, ToolFeedback } from "./DrawerClient";
 
 const Dots = ({ n }: { n: number }) => (
   <span className="dots" aria-label={`Confiance ${n} sur 5`}>
@@ -36,6 +36,12 @@ export default async function CompanyDrawer({ id, f, path }: { id: string; f: Fi
   const toolsByCat = new Map<string, typeof c.tools>();
   for (const t of c.tools) toolsByCat.set(t.category, [...(toolsByCat.get(t.category) ?? []), t]);
 
+  const note = [
+    `Vigie RH · ${c.name}${c.siren ? ` (SIREN ${formatSiren(c.siren)})` : ""} · score ${c.scoreTotal}/100 · ${fmtDate(new Date())}`,
+    ...c.signals.slice(0, 8).map((s) => `• ${fmtDate(s.date)} · ${SIGNAL_TYPES[s.type as SignalType]?.l ?? s.type} · ${s.summary}${s.url ? ` (${s.url})` : ""}`),
+    ...(c.tools.length ? [`Outils en place : ${c.tools.filter((t) => t.feedback !== "ko").map((t) => t.tool).join(", ")}`] : []),
+  ].join("\n");
+
   return (
     <>
       <Link className="scrim" href={closeHref} scroll={false} aria-label="Fermer la fiche" tabIndex={-1} />
@@ -49,7 +55,7 @@ export default async function CompanyDrawer({ id, f, path }: { id: string; f: Fi
         </div>
         <div className="actions">
           <StarButton id={c.id} name={c.name} followed={!!c.followed} asButton />
-          <HubspotButton />
+          <CopyForHubspot text={note} />
           <CustomerButton id={c.id} closeHref={closeHref} />
           <ExcludeButton id={c.id} closeHref={closeHref} />
         </div>

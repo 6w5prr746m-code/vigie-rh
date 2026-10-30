@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import ImportWizard from "@/components/ImportWizard";
+import UniverseCard from "@/components/UniverseCard";
 import ExclusionList from "@/components/ExclusionList";
 
 const KIND_LABEL: Record<string, string> = { entreprises: "Entreprises", contacts: "Contacts", exclusions: "Liste d'exclusion", univers: "Univers cible" };
@@ -19,6 +20,7 @@ export default async function ImporterPage() {
     <div className="wrap" style={{ gridTemplateColumns: "minmax(0,1fr) 320px" }}>
       <main>
         <div className="head"><div><h1>Importer mes données</h1><p>{counts[0].toLocaleString("fr-FR")} entreprises · {counts[1].toLocaleString("fr-FR")} contacts · {counts[2].toLocaleString("fr-FR")} clients exclus</p></div></div>
+        <UniverseCard />
         <ImportWizard />
         <section className="tablebox" style={{ padding: 16 }}>
           <h2 className="rail-title">Historique des imports</h2>
@@ -42,7 +44,7 @@ export default async function ImporterPage() {
           <li>Entreprises (ou Contacts) → choisissez votre vue (ex. « Mes entreprises »).</li>
           <li>Bouton « Exporter » → format CSV ou XLSX, « Inclure uniquement les propriétés de la vue » ou toutes.</li>
           <li>Pour les contacts, ajoutez la colonne « Entreprise associée principale » (et son ID) à la vue avant l&apos;export.</li>
-          <li>Importez d&apos;abord les entreprises, puis les contacts, puis la liste d&apos;exclusion.</li>
+          <li>Ordre conseillé : liste d&apos;exclusion, univers cible, entreprises HubSpot, contacts.</li>
         </ol>
         <p className="sub">Réimporter un export plus récent met à jour les fiches sans doublon et détecte les changements de poste.</p>
       </aside>

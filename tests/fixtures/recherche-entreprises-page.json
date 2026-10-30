@@ -1,0 +1,8 @@
+{
+  "results": [
+    { "siren": "900000001", "nom_complet": "EXEMPLE FICTIF INDUSTRIES (EFI)", "nom_raison_sociale": "EXEMPLE FICTIF INDUSTRIES", "activite_principale": "28.29B", "section_activite_principale": "C", "tranche_effectif_salarie": "51", "categorie_entreprise": "GE", "nature_juridique": "5710", "etat_administratif": "A", "siege": { "libelle_commune": "LYON 3EME", "code_postal": "69003" }, "complements": { "est_service_public": false } },
+    { "siren": "900000002", "nom_complet": "OFFICE PUBLIC FICTIF", "nom_raison_sociale": "OFFICE PUBLIC FICTIF", "activite_principale": "68.20A", "section_activite_principale": "L", "tranche_effectif_salarie": "42", "nature_juridique": "4140", "etat_administratif": "A", "siege": { "libelle_commune": "LILLE" }, "complements": { "est_service_public": true } },
+    { "siren": "900000003", "nom_complet": "EXEMPLE FICTIF BANQUE", "nom_raison_sociale": "EXEMPLE FICTIF BANQUE", "activite_principale": "64.19Z", "section_activite_principale": "K", "tranche_effectif_salarie": "52", "nature_juridique": "5599", "etat_administratif": "A", "siege": { "libelle_commune": "PARIS 8" }, "complements": { "est_service_public": false } }
+  ],
+  "total_results": 3, "page": 1, "per_page": 25, "total_pages": 1
+}

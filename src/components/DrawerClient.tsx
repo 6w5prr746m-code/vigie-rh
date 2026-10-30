@@ -30,8 +30,13 @@ export function ExcludeButton({ id, closeHref }: { id: string; closeHref: string
   );
 }
 
-export function HubspotButton() {
-  return <button type="button" className="btn small primary" onClick={() => toast("La création dans HubSpot arrive à l'étape 3")}>Créer dans HubSpot</button>;
+/** Copie un résumé des signaux, prêt à coller en note sur la fiche entreprise HubSpot. */
+export function CopyForHubspot({ text }: { text: string }) {
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(text); toast("Résumé copié : collez-le en note dans HubSpot"); }
+    catch { toast("Copie impossible dans ce navigateur"); }
+  };
+  return <button type="button" className="btn small primary" onClick={copy} title={text}>Copier pour HubSpot</button>;
 }
 
 export function ToolFeedback({ toolId }: { toolId: string }) {

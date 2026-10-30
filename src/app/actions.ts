@@ -3,6 +3,10 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { normalizeTitle } from "@/lib/titles";
 import { recomputeScores } from "@/lib/scoring";
+import { nameKey } from "@/lib/normalize";
+import { applyExclusionRules } from "@/lib/exclusions";
+import { apiSearch } from "@/lib/sources/recherche-entreprises";
+import { upsertFromApi } from "@/collect/univers";
 
 const refresh = () => revalidatePath("/", "layout");
 
@@ -54,4 +58,27 @@ export async function addContact(companyId: string, form: FormData) {
   });
   refresh();
   return { ok: true };
+}
+
+/** Ajoute (ou complète) une entreprise à partir de son SIREN via Recherche d'entreprises. */
+export async function addCompanyBySiren(siren: string) {
+  const page = await apiSearch({ q: siren, per_page: 1, page: 1 });
+  const api = page.results.find((r) => r.siren === siren);
+  if (!api) return { error: "SIREN introuvable dans Recherche d'entreprises." };
+  const { id } = await upsertFromApi(api);
+  await applyExclusionRules([id]);
+  await recomputeScores([id]);
+  refresh();
+  return { id };
+}
+
+/** Création manuelle, sans SIREN (à compléter plus tard par l'univers cible ou un import). */
+export async function addCompanyManual(name: string) {
+  const n = name.trim();
+  if (!n) return { error: "Le nom est obligatoire." };
+  const c = await prisma.company.create({ data: { name: n, nameKey: nameKey(n), headcountSource: null } });
+  await applyExclusionRules([c.id]);
+  await recomputeScores([c.id]);
+  refresh();
+  return { id: c.id };
 }
