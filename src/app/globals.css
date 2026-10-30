@@ -211,3 +211,10 @@ body{margin:0}
 a.type-chip{cursor:pointer}
 a.scrim{display:block}
 .rail[aria-busy="true"]{opacity:.7}
+.rail-title{font-family:var(--f-display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+@media (max-width:860px){.wrap[style]{grid-template-columns:1fr!important}}
+.addform{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.addform input{border:1px solid var(--line);background:var(--surface);border-radius:calc(var(--radius) - 4px);padding:6px 10px;min-width:0}
+.addform label{display:flex;flex-direction:column;gap:2px}
+.addform button{align-self:end}
+@media (max-width:520px){.addform{grid-template-columns:1fr}}

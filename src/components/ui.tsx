@@ -25,8 +25,8 @@ export const ToolsCell = ({ tools }: { tools: { tool: string }[] }) => {
   );
 };
 
-export const structLine = (c: { structure: string; subsidiariesCount: number }) =>
-  c.structure === "mere" && c.subsidiariesCount ? `Maison mère, ${c.subsidiariesCount} filiales` : STRUCTURES[c.structure] ?? c.structure;
+export const structLine = (c: { structure: string | null; subsidiariesCount: number }) =>
+  c.structure === "mere" && c.subsidiariesCount ? `Maison mère, ${c.subsidiariesCount} filiales` : (c.structure ? STRUCTURES[c.structure] ?? c.structure : "Structure non renseignée");
 
 /** Lien qui ouvre la fiche entreprise en tiroir, en gardant les filtres courants. */
 export const CompanyLink = ({ f, path, id, name }: { f: Filters; path: string; id: string; name: string }) => (

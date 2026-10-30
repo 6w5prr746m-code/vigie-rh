@@ -8,6 +8,7 @@ const NAV = [
   { href: "/cartographie", label: "Cartographie" },
   { href: "/priorites", label: "Priorités" },
   { href: "/suivis", label: "Mes comptes suivis", badge: true },
+  { href: "/importer", label: "Importer" },
 ];
 const SKINS = [["apple", "Apple"], ["instagram", "Instagram"], ["vigie", "Vigie"]] as const;
 

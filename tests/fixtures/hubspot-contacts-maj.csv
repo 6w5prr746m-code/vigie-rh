@@ -1,0 +1,4 @@
+Record ID,Prénom,Nom,E-mail,Intitulé du poste,Entreprise associée principale,ID d'entreprise associée
+5001,Alice,Fictive,alice@exemple-fictif.invalid,Directrice des Ressources Humaines,Exemple Fictif Industries SAS,1001
+5002,Bruno,Exemple,bruno@logiciels-fictifs.invalid,Responsable SIRH,Exemple Fictif Logiciels,1004
+5003,Chloé,Test,chloe@logiciels-fictifs.invalid,Responsable paie,Exemple Fictif Logiciels,1004

@@ -10,7 +10,8 @@ Le prototype validé `vigie-rh-prototype.html` (à la racine) fait référence p
 |---|---|---|
 | 1 | Socle : schéma Prisma, seed de démo, layout, 3 thèmes clair/sombre | ✅ |
 | 2 | Écrans Signaux, Cartographie, fiche entreprise, pagination serveur | ✅ |
-| 3 | Connecteur HubSpot (lecture puis écriture) | à venir |
+| 3a | Mes données sans API : import CSV / Excel (exports HubSpot inclus), liste d'exclusion, saisie | ✅ |
+| 3b | Univers cible (Recherche d'entreprises), export pour l'import HubSpot | à venir |
 | 4 | Collecte Sirene, France Travail, actualités + classification Claude | à venir |
 | 5 | Score configurable, Priorités, Comptes suivis, badge « nouveaux » | à venir |
 | 6 | Export Excel des vues filtrées | à venir |
@@ -38,7 +39,6 @@ npm run dev               # http://localhost:3000
 | Variable | Usage | Étape |
 |---|---|---|
 | `DATABASE_URL` | Base de données (`file:./dev.db` en local) | 1 |
-| `HUBSPOT_TOKEN` | Jeton de la Private App HubSpot | 3 |
 | `INSEE_API_KEY` | Clé API Sirene (portail-api.insee.fr) | 4 |
 | `FRANCE_TRAVAIL_CLIENT_ID` / `FRANCE_TRAVAIL_CLIENT_SECRET` | Application francetravail.io, API Offres d'emploi v2 | 4 |
 | `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` | Classification et résumé des actualités (défaut `claude-haiku-5-5`) | 4 |
@@ -55,7 +55,8 @@ Le fichier `.env` n'est jamais commité (voir `.gitignore`).
 | `npm run db:seed` | Charge les données de démo (fictives, marquées `isDemo`) |
 | `npm run db:purge-demo` | Supprime toutes les données de démo |
 | `npm run db:studio` | Explorateur de base Prisma Studio |
-| `npm run collect` | Collecte des sources (à partir de l'étape 3) |
+| `npm run import -- --kind=entreprises\|contacts\|exclusions --file=…` | Import d'un fichier CSV / XLSX en ligne de commande (`--dry-run` : affiche la correspondance des colonnes ; `--no-create` : n'invente pas d'entreprise pour un contact orphelin) |
+| `npm run collect` | Collecte des sources (étape 4) |
 | `npm test` | Tests unitaires (Vitest) |
 | `npm run typecheck` / `npm run lint` | Vérifications TypeScript et ESLint |
 
@@ -66,6 +67,22 @@ Le fichier `.env` n'est jamais commité (voir `.gitignore`).
 - **Fiche entreprise** : tiroir ouvert par `?fiche=<id>` (lien partageable), score détaillé, outils avec confirmation / correction, contacts par famille de fonction, 30 derniers signaux ; suivre, exclure du périmètre.
 
 Les filtres, le tri et la page sont dans l'URL : une vue filtrée se recharge à l'identique. Pagination côté serveur (25, 50 ou 100 lignes via `per`), sans plafond de résultats.
+
+## Importer mes données (sans connexion HubSpot)
+
+Page **Importer** (`/importer`) ou commande `npm run import`. Formats : CSV (séparateur `,` ou `;` détecté) et Excel `.xlsx`.
+
+1. **Entreprises** : export HubSpot « Entreprises » ou fichier maison. En-têtes HubSpot reconnus en français et en anglais (Record ID, Nom de l'entreprise, Nombre d'employés, Secteur d'activité, Phase du cycle de vie, Entreprise parente…). La correspondance se corrige à l'écran.
+   - Phase du cycle de vie « Client » / « Customer » (ou colonne Client = oui) → compte marqué client et exclu du périmètre.
+   - Secteur HubSpot ou code NAF → secteur du référentiel ; « Entreprise parente » → lien maison mère / filiale.
+2. **Contacts** : export HubSpot « Contacts » (ajouter « Entreprise associée principale » et son ID à la vue). L'intitulé est normalisé en fonction + famille (DRH, Responsable SIRH, Gestionnaire de paie…). Option : créer les entreprises introuvables.
+3. **Liste d'exclusion** : SIREN et / ou nom de vos clients. Les règles s'appliquent aussi aux comptes importés plus tard ; gérables dans la colonne de droite de `/importer`.
+
+**Ré-import** : sans doublon (rapprochement par ID HubSpot, SIREN, nom normalisé, e-mail). Un contact qui change d'entreprise génère un signal **Départ** (ancienne) et **Arrivée** (nouvelle) ; un changement de fonction génère une **Arrivée** sur le poste. Les scores des comptes touchés sont recalculés.
+
+**Saisie** depuis la fiche : « + Ajouter un contact », « Client signé » (exclut le compte ; réintégrable depuis le rail).
+
+Exemples fictifs de fichiers : `tests/fixtures/`.
 
 ## Données de démo
 

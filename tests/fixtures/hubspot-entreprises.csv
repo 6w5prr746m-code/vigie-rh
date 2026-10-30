@@ -1,0 +1,5 @@
+Record ID;Nom de l'entreprise;Nom de domaine de l'entreprise;Nombre d'employés;Secteur d'activité;Ville;Phase du cycle de vie;Entreprise parente
+1001;Exemple Fictif Industries SAS;exemple-fictif.invalid;2 300;Machinery;Lyon;Opportunité;
+1002;Exemple Fictif Filiale Est;filiale-est.invalid;650;MACHINERY;Metz;Lead;Exemple Fictif Industries SAS
+1003;Exemple Fictif Banque;banque-fictive.invalid;4500;Banking;Paris;Client;
+1004;Exemple Fictif Logiciels;logiciels-fictifs.invalid;1200;Computer Software;Nantes;Lead;

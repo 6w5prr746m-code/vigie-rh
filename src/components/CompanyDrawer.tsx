@@ -5,7 +5,7 @@ import { toQuery, type Filters } from "@/lib/filters";
 import { fmt, fmtDate, formatSiren } from "@/lib/format";
 import { Pill, structLine } from "./ui";
 import StarButton from "./StarButton";
-import { DrawerClose, ExcludeButton, HubspotButton, ToolFeedback } from "./DrawerClient";
+import { AddContactForm, CustomerButton, DrawerClose, ExcludeButton, HubspotButton, ToolFeedback } from "./DrawerClient";
 
 const Dots = ({ n }: { n: number }) => (
   <span className="dots" aria-label={`Confiance ${n} sur 5`}>
@@ -50,6 +50,7 @@ export default async function CompanyDrawer({ id, f, path }: { id: string; f: Fi
         <div className="actions">
           <StarButton id={c.id} name={c.name} followed={!!c.followed} asButton />
           <HubspotButton />
+          <CustomerButton id={c.id} closeHref={closeHref} />
           <ExcludeButton id={c.id} closeHref={closeHref} />
         </div>
         <div className="facts">
@@ -84,7 +85,7 @@ export default async function CompanyDrawer({ id, f, path }: { id: string; f: Fi
 
         <section>
           <h3>Qui appeler · {c.contacts.length}</h3>
-          {c.contacts.length === 0 && <p className="sub">Aucun contact. Importez-les depuis HubSpot ou un CSV.</p>}
+          {c.contacts.length === 0 && <p className="sub">Aucun contact. Importez un export HubSpot ou ajoutez-en un ci-dessous.</p>}
           {[...families].map(([fam, ps]) => (
             <div key={fam}>
               <div className="sub" style={{ marginTop: 8, textTransform: "uppercase", letterSpacing: ".06em", fontSize: 11 }}>{fam}</div>
@@ -96,6 +97,7 @@ export default async function CompanyDrawer({ id, f, path }: { id: string; f: Fi
               ))}
             </div>
           ))}
+          <AddContactForm companyId={c.id} />
         </section>
 
         <section>

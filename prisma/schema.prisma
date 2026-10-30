@@ -24,7 +24,7 @@ model Company {
   headcountRange    String? // code tranche INSEE (ex. "42")
   headcountSource   String? // sirene | hubspot | csv | manuel | demo
   groupHeadcount    Int?
-  structure         String    @default("indep") // indep | mere | filiale | reseau
+  structure         String? // indep | mere | filiale | reseau (null = non renseignée)
   subsidiariesCount Int       @default(0)
   parentId          String?
   parent            Company?  @relation("Groupe", fields: [parentId], references: [id], onDelete: SetNull)
@@ -140,4 +140,25 @@ model Setting {
   key       String   @id
   value     String
   updatedAt DateTime @updatedAt
+}
+
+// Liste d'exclusion (clients signés…) : appliquée à l'import et à chaque création d'entreprise,
+// y compris pour des comptes qui ne sont pas encore en base.
+model ExclusionRule {
+  id        String   @id @default(cuid())
+  siren     String?  @unique
+  nameKey   String?
+  label     String
+  createdAt DateTime @default(now())
+
+  @@index([nameKey])
+}
+
+// Historique des imports (fichiers, univers cible)
+model ImportRun {
+  id        String   @id @default(cuid())
+  kind      String // entreprises | contacts | exclusions | univers
+  fileName  String?
+  stats     String // JSON
+  createdAt DateTime @default(now())
 }
