@@ -1,0 +1,580 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Vigie RH</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: barre d'app fixe + rail de filtres à gauche + table de travail ; fiche compte en tiroir à droite */
+:root{
+  --bg:#F3F5F4; --surface:#FFFFFF; --sunk:#E8ECEA; --line:#D5DCD9;
+  --ink:#14211D; --muted:#5C6B66; --accent:#C2410C; --accent-soft:#FBE6DA;
+  --deep:#0F3B33; --deep-ink:#E7F1ED;
+  --t-ent:#1D5C8F; --t-ent-bg:#E1ECF6; --t-dec:#7A3E9D; --t-dec-bg:#EFE4F5;
+  --t-job:#0F7A5C; --t-job-bg:#DDF1E9; --t-arr:#8A6200; --t-arr-bg:#F6EDD3; --t-dep:#A3282E; --t-dep-bg:#F7E0E1;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1513; --surface:#151F1C; --sunk:#1C2925; --line:#2B3A35;
+  --ink:#E4ECE9; --muted:#93A39D; --accent:#F08A4B; --accent-soft:#3A2418;
+  --deep:#0A2A24; --deep-ink:#D7E9E2;
+  --t-ent:#8CC0EA; --t-ent-bg:#1A2C3B; --t-dec:#D2A6EC; --t-dec-bg:#2C1F36; --t-job:#6FD3AF; --t-job-bg:#15322A;
+  --t-arr:#E9C46A; --t-arr-bg:#33290F; --t-dep:#F0989B; --t-dep-bg:#3A1C1E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1513; --surface:#151F1C; --sunk:#1C2925; --line:#2B3A35;
+  --ink:#E4ECE9; --muted:#93A39D; --accent:#F08A4B; --accent-soft:#3A2418;
+  --deep:#0A2A24; --deep-ink:#D7E9E2;
+  --t-ent:#8CC0EA; --t-ent-bg:#1A2C3B; --t-dec:#D2A6EC; --t-dec-bg:#2C1F36; --t-job:#6FD3AF; --t-job-bg:#15322A;
+  --t-arr:#E9C46A; --t-arr-bg:#33290F; --t-dep:#F0989B; --t-dep-bg:#3A1C1E; color-scheme:dark}
+:root{--grad:var(--accent);--radius:10px;--bar-line:transparent}
+
+/* Habillage « Apple » : gris perle, bleu système, barre translucide */
+:root[data-skin="apple"]{
+  --bg:#F5F5F7; --surface:#FFFFFF; --sunk:#EDEDF0; --line:#DCDCE1; --ink:#1D1D1F; --muted:#6E6E73;
+  --accent:#0071E3; --accent-soft:#E3EFFC; --deep:rgba(251,251,253,.82); --deep-ink:#1D1D1F; --grad:#0071E3; --radius:14px; --bar-line:#DCDCE1;
+  --f-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;
+  --f-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+/* Habillage « Instagram » : blanc franc, dégradé coucher de soleil */
+:root[data-skin="instagram"]{
+  --bg:#FAFAFA; --surface:#FFFFFF; --sunk:#F0F0F0; --line:#DBDBDB; --ink:#262626; --muted:#737373;
+  --accent:#D62976; --accent-soft:#FDE7F1; --deep:#FFFFFF; --deep-ink:#262626; --radius:12px; --bar-line:#DBDBDB;
+  --grad:linear-gradient(45deg,#FEDA75 0%,#FA7E1E 25%,#D62976 50%,#962FBF 75%,#4F5BD5 100%);
+  --f-display:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --f-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --f-mono:ui-monospace,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){
+  :root[data-skin="apple"]:not([data-theme="light"]){--bg:#000000; --surface:#1C1C1E; --sunk:#2C2C2E; --line:#38383A; --ink:#F5F5F7; --muted:#98989D;
+    --accent:#0A84FF; --accent-soft:#0A2A4A; --deep:rgba(22,22,23,.82); --deep-ink:#F5F5F7; --grad:#0A84FF; --bar-line:#38383A}
+  :root[data-skin="instagram"]:not([data-theme="light"]){--bg:#000000; --surface:#121212; --sunk:#1E1E1E; --line:#2E2E2E; --ink:#F5F5F5; --muted:#A8A8A8;
+    --accent:#FF3D8B; --accent-soft:#3A1426; --deep:#000000; --deep-ink:#F5F5F5; --bar-line:#2E2E2E}}
+:root[data-skin="apple"][data-theme="dark"]{--bg:#000000; --surface:#1C1C1E; --sunk:#2C2C2E; --line:#38383A; --ink:#F5F5F7; --muted:#98989D;
+  --accent:#0A84FF; --accent-soft:#0A2A4A; --deep:rgba(22,22,23,.82); --deep-ink:#F5F5F7; --grad:#0A84FF; --bar-line:#38383A}
+:root[data-skin="instagram"][data-theme="dark"]{--bg:#000000; --surface:#121212; --sunk:#1E1E1E; --line:#2E2E2E; --ink:#F5F5F5; --muted:#A8A8A8;
+  --accent:#FF3D8B; --accent-soft:#3A1426; --deep:#000000; --deep-ink:#F5F5F5; --bar-line:#2E2E2E}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--deep)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* barre d'app */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--deep);color:var(--deep-ink);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.brand{font-family:var(--f-display);font-weight:800;font-size:18px;letter-spacing:.01em;display:flex;align-items:center;gap:8px}
+.brand i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent)}
+.nav{display:flex;gap:4px;flex-wrap:wrap}
+.nav a{color:inherit;text-decoration:none;padding:6px 12px;border-radius:6px;font-weight:500;opacity:.8}
+.nav a[aria-current="page"]{background:color-mix(in srgb,var(--deep-ink) 14%,transparent);opacity:1}
+.nav a .badge{font-family:var(--f-mono);font-size:11px;margin-left:6px;padding:1px 6px;border-radius:10px;background:var(--accent);color:#fff}
+.bar .spacer{flex:1}
+.demo{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;border:1px dashed color-mix(in srgb,var(--deep-ink) 50%,transparent);padding:3px 8px;border-radius:4px}
+
+/* corps */
+.wrap{display:grid;grid-template-columns:280px minmax(0,1fr);gap:20px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+.rail{align-self:start;position:sticky;top:calc(env(safe-area-inset-top,0px) + 64px);max-height:calc(100vh - 84px);overflow:auto;
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.rail h2{font-family:var(--f-display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.rail .reset{font-family:var(--f-body);text-transform:none;letter-spacing:0;font-size:12px;background:none;border:0;color:var(--accent);padding:0}
+details.fg{border-top:1px solid var(--line);padding-block:8px}
+details.fg>summary{list-style:none;font-weight:600;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+details.fg>summary::-webkit-details-marker{display:none}
+details.fg>summary::after{content:"+";font-family:var(--f-mono);color:var(--muted)}
+details.fg[open]>summary::after{content:"–"}
+details.fg .cnt{font-family:var(--f-mono);font-size:11px;background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:0 6px;margin-left:6px}
+.opts{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.opts .grp{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.opts label{display:flex;gap:8px;align-items:flex-start;padding:3px 2px;border-radius:4px;cursor:pointer}
+.opts label:hover{background:var(--sunk)}
+.opts input{accent-color:var(--accent);margin-top:3px}
+.seg{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.seg button{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 9px;font-size:12px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+
+main{min-width:0;display:flex;flex-direction:column;gap:14px}
+.head{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.head h1{font-family:var(--f-display);font-weight:800;font-size:28px;margin:0;text-wrap:balance}
+.head p{margin:2px 0 0;color:var(--muted)}
+.search{display:flex;gap:8px;flex-wrap:wrap}
+.search input{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px;min-width:0;width:260px;max-width:100%}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px;font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.small{padding:4px 9px;font-size:12px}
+.only-mobile{display:none}
+
+.types{display:flex;gap:8px;flex-wrap:wrap}
+.type-chip{display:flex;align-items:baseline;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px}
+.type-chip b{font-family:var(--f-mono);font-weight:500}
+.type-chip[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+
+.tablebox{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--surface);position:sticky;top:0}
+th[data-sort]{cursor:pointer}
+th[data-sort]:hover{color:var(--ink)}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:color-mix(in srgb,var(--sunk) 60%,transparent)}
+.co{background:none;border:0;padding:0;font-weight:600;text-align:left;color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.co:hover{text-decoration-color:var(--accent)}
+.sub{color:var(--muted);font-size:12px}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.p-ent{color:var(--t-ent);background:var(--t-ent-bg)}.p-dec{color:var(--t-dec);background:var(--t-dec-bg)}
+.p-job{color:var(--t-job);background:var(--t-job-bg)}.p-arr{color:var(--t-arr);background:var(--t-arr-bg)}.p-dep{color:var(--t-dep);background:var(--t-dep-bg)}
+.theme{font-size:12px;color:var(--muted)}
+.date{font-family:var(--f-mono);font-size:12px;white-space:nowrap;color:var(--muted)}
+.tool{display:inline-block;font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 6px;margin:0 4px 4px 0;white-space:nowrap}
+.tool.rival{border-color:var(--accent);color:var(--accent)}
+.score{display:flex;align-items:center;gap:8px;font-family:var(--f-mono)}
+.score .meter{width:56px;height:6px;border-radius:3px;background:var(--sunk);overflow:hidden}
+.score .meter span{display:block;height:100%;background:var(--accent)}
+.star{background:none;border:0;font-size:16px;line-height:1;color:var(--muted);padding:2px}
+.star[aria-pressed="true"]{color:var(--accent)}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted)}
+.pager .btns{display:flex;gap:6px}
+.empty{padding:40px 16px;text-align:center;color:var(--muted)}
+
+/* tiroir fiche */
+.scrim{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 35%,transparent);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--surface);z-index:41;overflow:auto;
+  border-left:1px solid var(--line);padding:calc(env(safe-area-inset-top,0px) + 20px) max(20px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 24px) 20px;
+  display:flex;flex-direction:column;gap:18px}
+.drawer h2{font-family:var(--f-display);font-size:24px;margin:0}
+.drawer h3{font-family:var(--f-display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.dhead{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.fact{background:var(--sunk);border-radius:8px;padding:8px 10px}
+.fact .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.fact .v{font-weight:600}
+.why{display:flex;flex-direction:column;gap:6px}
+.why div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:4px}
+.why b{font-family:var(--f-mono);font-weight:500}
+.toolrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.dots{display:inline-flex;gap:3px;margin-left:8px;vertical-align:middle}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--ink)}
+.person{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.person .mail{font-family:var(--f-mono);font-size:12px;user-select:all}
+.sig{padding:8px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 20px);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:8px;z-index:60}
+
+/* habillages : rayons, dégradé, barre */
+.bar{border-bottom:1px solid var(--bar-line);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+.rail,.tablebox{border-radius:var(--radius)}
+.btn,.search input,.type-chip{border-radius:calc(var(--radius) - 2px)}
+.btn.primary{background:var(--grad);border-color:transparent}
+.brand i,.score .meter span,.nav a .badge{background:var(--grad)}
+:root[data-skin="instagram"] .brand{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+:root[data-skin="instagram"] .brand i{box-shadow:none}
+:root[data-skin="apple"] .brand i{box-shadow:none}
+:root[data-skin="apple"] .head h1,:root[data-skin="instagram"] .head h1{letter-spacing:-.02em;font-weight:700}
+.skins{display:flex;gap:2px;background:color-mix(in srgb,var(--deep-ink) 10%,transparent);padding:3px;border-radius:999px}
+.skins button{border:0;background:none;color:var(--deep-ink);font-size:12px;font-weight:500;padding:4px 10px;border-radius:999px;opacity:.75}
+.skins button[aria-pressed="true"]{background:var(--surface);color:var(--ink);opacity:1;box-shadow:0 1px 3px color-mix(in srgb,var(--ink) 20%,transparent)}
+.modebtn{border:0;background:none;color:var(--deep-ink);font-size:16px;padding:4px 6px;opacity:.8}
+
+@media (max-width:860px){
+  .wrap{grid-template-columns:1fr}
+  .rail{position:static;max-height:none}
+  .rail[data-collapsed="true"]{display:none}
+  .only-mobile{display:inline-block}
+}
+@media (prefers-reduced-motion:no-preference){.drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}}}
+</style>
+
+<header class="bar">
+  <div class="brand"><i aria-hidden="true"></i>Vigie RH</div>
+  <nav class="nav" aria-label="Sections">
+    <a href="#signaux" data-view="signaux">Signaux</a>
+    <a href="#cartographie" data-view="cartographie">Cartographie</a>
+    <a href="#priorites" data-view="priorites">Priorités</a>
+    <a href="#suivis" data-view="suivis">Mes comptes suivis<span class="badge num" id="suivisBadge" hidden></span></a>
+  </nav>
+  <span class="spacer"></span>
+  <div class="skins" role="group" aria-label="Thème">
+    <button data-skin="apple">Apple</button><button data-skin="instagram">Instagram</button><button data-skin="vigie">Vigie</button>
+  </div>
+  <button class="modebtn" id="modeBtn" aria-label="Basculer clair / sombre">◐</button>
+  <span class="demo" title="Entreprises, contacts et signaux inventés pour le prototype">Données de démo</span>
+</header>
+
+<div class="wrap">
+  <aside class="rail" id="rail" aria-label="Filtres"></aside>
+  <main id="main"></main>
+</div>
+<div id="drawerRoot"></div>
+
+<script>
+/* ---------- Référentiels ---------- */
+const THEMES={
+  "Changements chez le compte":["Dirigeants et gouvernance","Fusion, acquisition, cession","Organisation et effectifs","Sites et implantations","International","Stratégie et résultats","Investissements","Outils et projets RH","Marque et identité"],
+  "RH et talents":["Croissance et recrutement","Recrutement","Formation et compétences","Marque employeur et labels","Conditions de travail et QVT","Dialogue social"],
+  "Occasions de rencontre":["Événements et salons"],
+  "RSE et engagement":["RSE et engagement"],
+  "Autres":["Partenariats","Communication commerciale","Contrats et réalisations","Expertise","Vie interne","Autre"]
+};
+const FONCTIONS={
+  "Ressources humaines":["DRH","Responsable RH"],
+  "DSI":["DSI"],
+  "SIRH":["Directeur SIRH","Responsable SIRH","Chef de projet SIRH","Chargé SIRH"],
+  "Paie":["Directeur paie","Responsable paie","Chef de projet paie","Gestionnaire de paie"],
+  "GTA":["Responsable GTA","Chef de projet GTA","Gestionnaire GTA"],
+  "Transformation digitale":["Transformation digitale"],
+  "Formation et talents":["Directeur formation","Responsable formation","Responsable talents","Chargé de formation"]
+};
+const OUTILS={
+  "Moteur de paie":["ADP","Cegid Paie","HR Access","SAP HCM","Silae","Talentia","Sage Paie","PayFit","Pléiades","Nibelis"],
+  "SIRH / Core HR":["Workday","SAP SuccessFactors","Oracle HCM","Lucca","PeopleSpheres","Eurécia"],
+  "GTA":["Horoquartz","Chronotime","Octime","Kelio","UKG Pro WFM"],
+  "Gestion des talents":["Cornerstone","Talentsoft - Cegid HR","365Talents","360Learning","Digital Recruiters"]
+};
+const MY_PRODUCT="PeopleSpheres";
+const RIVALS=new Set(["Workday","SAP SuccessFactors","Oracle HCM","Cegid Paie","Talentsoft - Cegid HR","Cornerstone","Talentia","Lucca","Eurécia"]);
+const SECTEURS=["Aéronautique","Agroalimentaire","Assurance","Automobile","Banque","BTP / Immobilier","Chimie","Commerce / Négoce","Conseil / Ingénierie","Énergie","Environnement","Industrie","Industrie Pharma","IT / Telecom","Luxe","Médical / Santé","Public","Restauration","Services","Transport / logistique"];
+const TRANCHES=[[250,499],[500,999],[1000,1999],[2000,4999],[5000,9999],[10000,19999],[20000,49999],[50000,1e9]];
+const trancheLabel=t=>t[1]>=1e9?`${fmt(t[0])} et plus`:`${fmt(t[0])} à ${fmt(t[1])}`;
+const STRUCTURES={indep:"Indépendante",mere:"Maison mère",filiale:"Filiale",reseau:"Membre d'un réseau"};
+const TYPES={ent:{l:"Actualité entreprise",c:"p-ent"},dec:{l:"Actualité décideur",c:"p-dec"},job:{l:"Offre d'emploi",c:"p-job"},arr:{l:"Arrivée",c:"p-arr"},dep:{l:"Départ",c:"p-dep"}};
+const TODAY=new Date("2026-10-30T12:00:00");
+
+/* ---------- Générateur de démo (déterministe, entièrement fictif) ---------- */
+let seed=20261030;const rnd=()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const pick=a=>a[Math.floor(rnd()*a.length)];const pickN=(a,n)=>[...a].sort(()=>rnd()-.5).slice(0,n);
+const fmt=n=>n.toLocaleString("fr-FR");
+const ROOTS=["Alvéa","Brennac","Corvalis","Duvernay","Estrelle","Fontanieu","Garance","Hélior","Isarde","Joncquière","Kervadec","Lunéa","Morvanne","Navéo","Orvalis","Pradelle","Quintane","Rocheval","Sablière","Terrasol","Ulmance","Valbreuse","Ysaline","Zéphyre","Aubrac","Bellerive","Calanque","Dorvane","Ermitage","Faverolle","Givrac","Hautmont","Ivrelle","Lescaut","Marlenne","Noirval","Ostrac","Pellerin","Roncière","Saulnay","Tavernel","Velours","Ambrine","Cassiel","Mirabeau","Solenne","Vercors","Arnelle"];
+const SUFFIX={"Aéronautique":"Aéro","Agroalimentaire":"Alimentaire","Assurance":"Assurances","Automobile":"Automotive","Banque":"Banque","BTP / Immobilier":"Construction","Chimie":"Chimie","Commerce / Négoce":"Distribution","Conseil / Ingénierie":"Ingénierie","Énergie":"Énergies","Environnement":"Environnement","Industrie":"Industries","Industrie Pharma":"Pharma","IT / Telecom":"Digital","Luxe":"Maison","Médical / Santé":"Santé","Public":"Département","Restauration":"Restauration","Services":"Services","Transport / logistique":"Logistique"};
+const ACTIV={"Aéronautique":"Équipementier aéronautique","Agroalimentaire":"Transformation laitière","Assurance":"Mutuelle santé et prévoyance","Automobile":"Sous-traitant automobile","Banque":"Banque régionale","BTP / Immobilier":"Construction et travaux publics","Chimie":"Chimie de spécialité","Commerce / Négoce":"Distribution spécialisée","Conseil / Ingénierie":"Ingénierie industrielle","Énergie":"Services énergétiques","Environnement":"Gestion des déchets","Industrie":"Fabrication d'équipements","Industrie Pharma":"Laboratoire pharmaceutique","IT / Telecom":"ESN et intégration","Luxe":"Maroquinerie haut de gamme","Médical / Santé":"Cliniques privées","Public":"Collectivité territoriale","Restauration":"Restauration collective","Services":"Propreté et facility","Transport / logistique":"Transport et entreposage"};
+const PRENOMS=["Claire","Julien","Sophie","Thomas","Camille","Nicolas","Élodie","Marc","Laure","Antoine","Inès","Romain","Aurélie","Hugo","Céline","Mathieu","Pauline","Olivier","Sarah","Vincent","Nadia","Bastien","Agathe","Karim"];
+const NOMS=["Mercier","Fabre","Lemoine","Garnier","Roux","Chevalier","Barbier","Perrin","Morel","Colin","Gauthier","Renard","Picard","Brunet","Leclerc","Aubert","Marchand","Robin","Vidal","Lacroix","Fleury","Carré","Joly","Benali"];
+const VILLES=["Lyon","Nantes","Lille","Toulouse","Bordeaux","Rennes","Montpellier","Strasbourg","Grenoble","Rouen","Clermont-Ferrand","Dijon"];
+const PROOFS={
+ "Dirigeants et gouvernance":c=>`Nomination d'un nouveau directeur général chez ${c}, en poste au 1er janvier.`,
+ "Fusion, acquisition, cession":c=>`${c} annonce l'acquisition d'un concurrent régional de 600 salariés.`,
+ "Organisation et effectifs":c=>`${c} réorganise ses fonctions support autour d'un centre de services partagés.`,
+ "Sites et implantations":c=>`Ouverture d'un nouveau site à ${pick(VILLES)}, 120 recrutements prévus.`,
+ "International":c=>`${c} s'implante en Espagne et en Italie avec deux filiales.`,
+ "Stratégie et résultats":c=>`Chiffre d'affaires semestriel en hausse de ${3+Math.floor(rnd()*9)} %, plan stratégique 2030 présenté.`,
+ "Investissements":c=>`Investissement de ${10+Math.floor(rnd()*60)} M€ dans la modernisation de ses usines.`,
+ "Outils et projets RH":c=>`${c} lance un appel d'offres pour remplacer son SIRH et unifier la paie de ses filiales.`,
+ "Marque et identité":c=>`${c} dévoile sa nouvelle identité de marque.`,
+ "Croissance et recrutement":c=>`${c} prévoit ${100+Math.floor(rnd()*400)} recrutements d'ici fin 2027.`,
+ "Recrutement":c=>`Job dating organisé à ${pick(VILLES)} pour ses métiers techniques.`,
+ "Formation et compétences":c=>`Création d'une académie interne pour former 800 managers.`,
+ "Marque employeur et labels":c=>`${c} obtient le label Top Employer 2027.`,
+ "Conditions de travail et QVT":c=>`Accord sur le télétravail et la semaine de 4 jours en test.`,
+ "Dialogue social":c=>`Signature d'un accord GEPP avec les organisations syndicales.`,
+ "Événements et salons":c=>`${c} sera présente au salon Solutions RH, stand B42.`,
+ "RSE et engagement":c=>`Publication du rapport RSE, objectif −30 % d'émissions d'ici 2030.`,
+ "Partenariats":c=>`Partenariat avec une école d'ingénieurs pour l'alternance.`,
+ "Communication commerciale":c=>`${c} présente sa nouvelle offre de services aux collectivités.`,
+ "Contrats et réalisations":c=>`${c} remporte un contrat pluriannuel de 40 M€.`,
+ "Expertise":c=>`Prise de parole sur l'IA appliquée aux métiers RH.`,
+ "Vie interne":c=>`Convention annuelle des collaborateurs à ${pick(VILLES)}.`,
+ "Autre":c=>`Mise à jour de la page entreprise.`
+};
+const ALL_THEMES=Object.values(THEMES).flat();
+const ALL_FN=Object.values(FONCTIONS).flat();
+const fnFamily=f=>Object.keys(FONCTIONS).find(k=>FONCTIONS[k].includes(f));
+const HOT_THEMES=new Set(["Outils et projets RH","Fusion, acquisition, cession","Organisation et effectifs","Dirigeants et gouvernance","Croissance et recrutement","International"]);
+const HOT_FAM=new Set(["SIRH","Paie","Ressources humaines","GTA"]);
+
+const companies=[];const contacts=[];const signals=[];
+ROOTS.forEach((root,i)=>{
+  const sect=SECTEURS[i%SECTEURS.length];
+  const t=TRANCHES[Math.min(7,Math.floor(Math.pow(rnd(),1.6)*8))];
+  const eff=Math.round((t[0]+rnd()*Math.min(t[1]-t[0],60000))/50)*50;
+  const struct=pick(["indep","mere","mere","filiale","reseau"]);
+  const grpEff=struct==="indep"?eff:Math.round(eff*(1+rnd()*1.5)/50)*50;
+  const tools={};
+  Object.entries(OUTILS).forEach(([cat,list])=>{if(rnd()<.85){tools[cat]=pickN(list.filter(x=>x!==MY_PRODUCT),1+Math.floor(rnd()*2)).map(n=>({n,conf:2+Math.floor(rnd()*4)}))}});
+  const name=sect==="Public"?`${SUFFIX[sect]} de ${root}`:`${root} ${SUFFIX[sect]}`;
+  const dom=root.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()+"-"+SUFFIX[sect].normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/\s/g,"")+".fr";
+  companies.push({id:"c"+i,name,sect,eff,grpEff,struct,pub:sect==="Public",foreign:rnd()<.15,activ:ACTIV[sect],tools,
+    filiales:struct==="mere"?2+Math.floor(rnd()*12):0,dom,siren:String(300000000+Math.floor(rnd()*599999999)).replace(/(\d{3})(\d{3})(\d{3})/,"$1 $2 $3")});
+});
+companies.forEach(c=>{
+  const n=2+Math.floor(rnd()*8);
+  for(let k=0;k<n;k++){
+    const fn=k===0?"DRH":pick(ALL_FN);const p=pick(PRENOMS),nm=pick(NOMS);
+    const since=new Date(TODAY-rnd()*6*365*864e5);
+    contacts.push({id:"p"+contacts.length,cid:c.id,name:`${p} ${nm}`,fn,since,mail:`${p[0].toLowerCase()}.${nm.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}@${c.dom}`});
+  }
+});
+const TYPE_W=[["ent",.42],["dec",.06],["job",.38],["arr",.09],["dep",.05]];
+for(let k=0;k<900;k++){
+  const c=companies[Math.floor(Math.pow(rnd(),1.3)*companies.length)];
+  let r=rnd(),type="ent";for(const[t,w]of TYPE_W){if(r<w){type=t;break}r-=w}
+  const date=new Date(TODAY-Math.pow(rnd(),1.8)*180*864e5);
+  let theme=null,fn=null,proof,person=null;
+  if(type==="ent"||type==="dec"){theme=pick(ALL_THEMES);proof=PROOFS[theme](c.name);
+    if(type==="dec"){person=`${pick(PRENOMS)} ${pick(NOMS)}`;proof=`${person} · ${proof}`}}
+  else{fn=pick(ALL_FN);person=`${pick(PRENOMS)} ${pick(NOMS)}`;
+    proof=type==="job"?`${fn} (F/H) — CDI, ${pick(VILLES)}`:type==="arr"?`${person} rejoint ${c.name} comme ${fn}`:`${person} quitte son poste de ${fn}`}
+  signals.push({id:"s"+k,cid:c.id,type,theme,fn,proof,date,src:`https://exemple.invalid/${c.dom}/${k}`});
+}
+signals.sort((a,b)=>b.date-a.date);
+const byCo=Object.fromEntries(companies.map(c=>[c.id,c]));
+
+/* ---------- Score de priorité (amélioration vs l'existant) ---------- */
+function scoreOf(c){
+  const sigs=signals.filter(s=>s.cid===c.id);const days=s=>(TODAY-s.date)/864e5;
+  const recent=sigs.filter(s=>days(s)<=90);
+  const hot=recent.filter(s=>(s.theme&&HOT_THEMES.has(s.theme))||(s.fn&&HOT_FAM.has(fnFamily(s.fn))));
+  const moves=recent.filter(s=>(s.type==="arr"||s.type==="dep")&&HOT_FAM.has(fnFamily(s.fn)));
+  const rivals=Object.values(c.tools).flat().filter(t=>RIVALS.has(t.n)).length;
+  const size=c.grpEff>=1000&&c.grpEff<=20000?1:c.grpEff>20000?.6:.3;
+  const parts=[
+    ["Signaux à fort intérêt (90 j)",Math.min(40,hot.length*8)],
+    ["Mouvements RH / SIRH / Paie",Math.min(20,moves.length*10)],
+    ["Activité récente",Math.min(15,recent.length*2)],
+    ["Taille dans la cible",Math.round(size*15)],
+    ["Outils concurrents en place",Math.min(10,rivals*3)]
+  ];
+  return{total:Math.min(100,parts.reduce((a,p)=>a+p[1],0)),parts,last:sigs[0]?.date||null,count:sigs.length};
+}
+companies.forEach(c=>c.score=scoreOf(c));
+
+/* ---------- État ---------- */
+const store={get(k,d){try{const v=localStorage.getItem("vigie."+k);return v?JSON.parse(v):d}catch{return d}},set(k,v){try{localStorage.setItem("vigie."+k,JSON.stringify(v))}catch{}}};
+const S={view:"signaux",q:"",period:"all",types:new Set(),themes:new Set(),fns:new Set(),secteurs:new Set(),tranches:new Set(),structs:new Set(),pub:new Set(),foreign:false,outils:new Set(),sigRecency:"any",
+  carto:"entreprises",page:1,per:25,sort:{k:null,dir:-1},
+  followed:new Set(store.get("followed",[])),excluded:new Set(store.get("excluded",[])),toolFeedback:store.get("toolFeedback",{}),seen:store.get("seen",null),railOpen:false};
+const persist=()=>{store.set("followed",[...S.followed]);store.set("excluded",[...S.excluded]);store.set("toolFeedback",S.toolFeedback)};
+
+/* ---------- Filtres ---------- */
+const days=d=>(TODAY-d)/864e5;
+const periodOk=d=>S.period==="all"||days(d)<=+S.period;
+function companyOk(c){
+  if(S.excluded.has(c.id))return false;
+  if(S.q&&!c.name.toLowerCase().includes(S.q.toLowerCase()))return false;
+  if(S.secteurs.size&&!S.secteurs.has(c.sect))return false;
+  if(S.tranches.size&&![...S.tranches].some(i=>c.eff>=TRANCHES[i][0]&&c.eff<=TRANCHES[i][1]))return false;
+  if(S.structs.size&&!S.structs.has(c.struct))return false;
+  if(S.pub.size&&!S.pub.has(c.pub?"oui":"non"))return false;
+  if(S.foreign&&!c.foreign)return false;
+  if(S.outils.size&&!Object.values(c.tools).flat().some(t=>S.outils.has(t.n)))return false;
+  return true;
+}
+function signalOk(s,ignoreType){
+  if(!companyOk(byCo[s.cid]))return false;
+  if(!periodOk(s.date))return false;
+  if(!ignoreType&&S.types.size&&!S.types.has(s.type))return false;
+  if(S.themes.size&&s.theme&&!S.themes.has(s.theme))return false;
+  if(S.themes.size&&!s.theme&&!S.fns.size)return false;
+  if(S.fns.size&&s.fn&&!S.fns.has(s.fn))return false;
+  if(S.fns.size&&!s.fn&&!S.themes.size)return false;
+  return true;
+}
+function sigRecencyOk(c){
+  if(S.sigRecency==="any")return true;
+  const l=c.score.last;if(!l)return false;
+  return S.sigRecency==="some"?true:days(l)<=+S.sigRecency;
+}
+
+/* ---------- Rendu du rail ---------- */
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+function group(title,key,setRef,dict,open){
+  const n=setRef.size;
+  const body=Array.isArray(dict)?dict.map((v,i)=>opt(key,typeof v==="object"?i:v,typeof v==="object"?trancheLabel(v):v,setRef)).join("")
+    :Object.entries(dict).map(([g,list])=>`<div class="grp">${esc(g)}</div>`+list.map(v=>opt(key,v,v,setRef)).join("")).join("");
+  return `<details class="fg" ${open||n?"open":""}><summary>${esc(title)}${n?`<span class="cnt num">${n}</span>`:""}</summary><div class="opts">${body}</div></details>`;
+}
+const opt=(key,val,label,setRef)=>`<label><input type="checkbox" data-k="${key}" value="${esc(val)}" ${setRef.has(val)||setRef.has(structKey(String(val)))?"checked":""}><span>${esc(label)}</span></label>`;
+function renderRail(){
+  const v=S.view;const sig=v==="signaux";
+  let h=`<h2>Filtres <button class="reset" id="reset">Tout effacer</button></h2>`;
+  if(sig){
+    h+=`<details class="fg" open><summary>Période</summary><div class="seg">${[["7","7 j"],["30","30 j"],["90","3 mois"],["all","Tout"]].map(([k,l])=>`<button data-period="${k}" aria-pressed="${S.period===k}">${l}</button>`).join("")}</div></details>`;
+    h+=group("Thèmes d'actualité","themes",S.themes,THEMES);
+    h+=group("Fonctions (emploi, mouvements)","fns",S.fns,FONCTIONS);
+  }else{
+    h+=`<details class="fg" open><summary>Signaux récents</summary><div class="seg">${[["any","Peu importe"],["7","7 j"],["30","30 j"],["90","3 mois"],["some","Au moins un"]].map(([k,l])=>`<button data-rec="${k}" aria-pressed="${S.sigRecency===k}">${l}</button>`).join("")}</div></details>`;
+    h+=group("Outils en place","outils",S.outils,OUTILS);
+  }
+  h+=group("Secteur","secteurs",S.secteurs,SECTEURS);
+  h+=group("Effectif de l'entité","tranches",S.tranches,TRANCHES);
+  h+=group("Structure","structs",S.structs,Object.values(STRUCTURES));
+  h+=`<details class="fg" ${S.pub.size||S.foreign?"open":""}><summary>Public / privé</summary><div class="opts">
+    <label><input type="checkbox" data-k="pub" value="non" ${S.pub.has("non")?"checked":""}><span>Privé</span></label>
+    <label><input type="checkbox" data-k="pub" value="oui" ${S.pub.has("oui")?"checked":""}><span>Public</span></label>
+    <label><input type="checkbox" id="foreign" ${S.foreign?"checked":""}><span>Rattaché à un groupe étranger</span></label></div></details>`;
+  if(S.excluded.size)h+=`<details class="fg"><summary>Comptes exclus<span class="cnt num">${S.excluded.size}</span></summary><div class="opts">${[...S.excluded].map(id=>`<label><button class="btn small" data-reinclude="${id}">Réintégrer</button><span>${esc(byCo[id].name)}</span></label>`).join("")}</div></details>`;
+  rail.innerHTML=h;
+  rail.dataset.collapsed=String(!S.railOpen);
+}
+const structKey=label=>Object.keys(STRUCTURES).find(k=>STRUCTURES[k]===label)||label;
+rail.addEventListener("change",e=>{
+  const i=e.target;if(i.id==="foreign"){S.foreign=i.checked}
+  else if(i.dataset.k){const setRef=S[i.dataset.k];let v=i.value;if(i.dataset.k==="tranches")v=+v;if(i.dataset.k==="structs")v=structKey(v);
+    i.checked?setRef.add(v):setRef.delete(v)}
+  S.page=1;render();
+});
+rail.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.id==="reset"){["types","themes","fns","secteurs","tranches","structs","pub","outils"].forEach(k=>S[k].clear());S.period="all";S.sigRecency="any";S.foreign=false;S.q=""}
+  if(b.dataset.period)S.period=b.dataset.period;
+  if(b.dataset.rec)S.sigRecency=b.dataset.rec;
+  if(b.dataset.reinclude){S.excluded.delete(b.dataset.reinclude);persist();toast("Compte réintégré")}
+  S.page=1;render();
+});
+
+/* ---------- Vues ---------- */
+const fmtDate=d=>d.toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"});
+const rel=d=>{if(!d)return"Aucun";const n=Math.floor(days(d));return n<1?"aujourd'hui":n===1?"hier":n<14?`il y a ${n} j`:n<60?`il y a ${Math.round(n/7)} sem.`:`il y a ${Math.round(n/30)} mois`};
+const pill=t=>`<span class="pill ${TYPES[t].c}">${TYPES[t].l}</span>`;
+const scoreCell=s=>`<span class="score"><span class="meter"><span style="width:${s.total}%"></span></span><span class="num">${s.total}</span></span>`;
+const starBtn=c=>`<button class="star" data-follow="${c.id}" aria-pressed="${S.followed.has(c.id)}" aria-label="${S.followed.has(c.id)?"Ne plus suivre":"Suivre"} ${esc(c.name)}">★</button>`;
+const toolsCell=c=>{const all=Object.values(c.tools).flat();return all.slice(0,3).map(t=>`<span class="tool ${RIVALS.has(t.n)?"rival":""}">${esc(t.n)}</span>`).join("")+(all.length>3?`<span class="sub">+${all.length-3}</span>`:"")||'<span class="sub">Non identifiés</span>'};
+const structLine=c=>c.struct==="mere"?`Maison mère, ${c.filiales} filiales`:STRUCTURES[c.struct];
+
+function header(title,sub,extra=""){
+  return `<div class="head"><div><h1>${title}</h1><p>${sub}</p></div><form class="search" id="search">
+  <button type="button" class="btn only-mobile" id="toggleRail">${S.railOpen?"Masquer":"Afficher"} les filtres</button>
+  <input id="q" type="search" placeholder="Rechercher une entreprise" value="${esc(S.q)}" aria-label="Rechercher une entreprise">${extra}</form></div>`;
+}
+function pager(total){
+  const pages=Math.max(1,Math.ceil(total/S.per));S.page=Math.min(S.page,pages);
+  const a=(S.page-1)*S.per+1,b=Math.min(total,S.page*S.per);
+  return `<div class="pager"><span class="num">${total?`${fmt(a)} à ${fmt(b)} sur ${fmt(total)}`:"0 résultat"} · aucune limite de consultation</span><div class="btns">
+  <button class="btn small" data-page="${S.page-1}" ${S.page<=1?"disabled":""}>Précédent</button><span class="num" style="align-self:center">${S.page} / ${pages}</span>
+  <button class="btn small" data-page="${S.page+1}" ${S.page>=pages?"disabled":""}>Suivant</button></div></div>`;
+}
+function sortRows(rows,getters){
+  if(!S.sort.k||!getters[S.sort.k])return rows;
+  const g=getters[S.sort.k];return[...rows].sort((a,b)=>{const x=g(a),y=g(b);return(x>y?1:x<y?-1:0)*S.sort.dir});
+}
+const th=(k,l)=>`<th ${k?`data-sort="${k}"`:""} ${S.sort.k===k?`aria-sort="${S.sort.dir>0?"ascending":"descending"}"`:""}>${l}${S.sort.k===k?(S.sort.dir>0?" ↑":" ↓"):""}</th>`;
+
+function viewSignaux(){
+  const base=signals.filter(s=>signalOk(s,true));
+  const counts=Object.fromEntries(Object.keys(TYPES).map(t=>[t,base.filter(s=>s.type===t).length]));
+  let rows=base.filter(s=>!S.types.size||S.types.has(s.type));
+  rows=sortRows(rows,{co:s=>byCo[s.cid].name,date:s=>+s.date,type:s=>s.type});
+  const page=rows.slice((S.page-1)*S.per,S.page*S.per);
+  return header("Signaux & actualités",`${fmt(rows.length)} signaux sur votre périmètre`)+
+  `<div class="types" role="group" aria-label="Types de signaux">
+    <button class="type-chip" data-type="" aria-pressed="${!S.types.size}">Tous <b class="num">${fmt(base.length)}</b></button>
+    ${Object.entries(TYPES).map(([k,t])=>`<button class="type-chip" data-type="${k}" aria-pressed="${S.types.has(k)}"><span class="pill ${t.c}">${t.l}</span><b class="num">${fmt(counts[k])}</b></button>`).join("")}
+  </div>
+  <div class="tablebox"><table><thead><tr><th></th>${th("co","Entreprise")}${th("type","Type")}<th>Preuve</th><th>Fonction ou thème</th>${th("date","Date")}</tr></thead><tbody>
+  ${page.map(s=>{const c=byCo[s.cid];return`<tr><td>${starBtn(c)}</td><td><button class="co" data-open="${c.id}">${esc(c.name)}</button><div class="sub">${esc(c.sect)} · ${fmt(c.eff)} sal.</div></td><td>${pill(s.type)}</td>
+    <td>${esc(s.proof)} <a class="sub" href="${s.src}" target="_blank" rel="noopener">source ↗</a></td><td class="theme">${esc(s.theme||s.fn)}</td><td class="date num">${fmtDate(s.date)}</td></tr>`}).join("")||`<tr><td colspan="6" class="empty">Aucun signal ne correspond à ces filtres. Élargissez la période ou retirez un thème.</td></tr>`}
+  </tbody></table></div>`+pager(rows.length);
+}
+function viewCarto(){
+  const cos=companies.filter(c=>companyOk(c)&&sigRecencyOk(c));
+  const toggle=`<div class="seg" role="group" aria-label="Vue"><button type="button" data-carto="entreprises" aria-pressed="${S.carto==="entreprises"}">Entreprises</button><button type="button" data-carto="contacts" aria-pressed="${S.carto==="contacts"}">Contacts</button></div>`;
+  if(S.carto==="contacts"){
+    const ids=new Set(cos.map(c=>c.id));
+    let rows=contacts.filter(p=>ids.has(p.cid)&&(!S.fns.size||S.fns.has(p.fn)));
+    rows=sortRows(rows,{name:p=>p.name,since:p=>+p.since,co:p=>byCo[p.cid].name});
+    const page=rows.slice((S.page-1)*S.per,S.page*S.per);
+    return header("Cartographie",`${fmt(rows.length)} contacts dans votre périmètre`,toggle)+
+    `<div class="tablebox"><table><thead><tr>${th("name","Contact")}<th>Fonction</th>${th("co","Entreprise")}${th("since","En poste depuis")}<th>E-mail</th></tr></thead><tbody>
+    ${page.map(p=>{const c=byCo[p.cid];return`<tr><td><b>${esc(p.name)}</b></td><td>${esc(p.fn)}<div class="sub">${esc(fnFamily(p.fn))}</div></td><td><button class="co" data-open="${c.id}">${esc(c.name)}</button></td><td class="date num">${fmtDate(p.since)}</td><td><span class="sub" style="font-family:var(--f-mono);user-select:all">${esc(p.mail)}</span></td></tr>`}).join("")}
+    </tbody></table></div>`+pager(rows.length);
+  }
+  let rows=sortRows(cos,{name:c=>c.name,eff:c=>c.eff,score:c=>c.score.total,last:c=>+(c.score.last||0)});
+  const page=rows.slice((S.page-1)*S.per,S.page*S.per);
+  return header("Cartographie",`${fmt(rows.length)} entreprises dans votre périmètre`,toggle)+
+  `<div class="tablebox"><table><thead><tr><th></th>${th("name","Entreprise")}${th("eff","Effectif")}<th>Outils en place</th><th>Contacts</th><th>Groupe</th>${th("score","Priorité")}${th("last","Dernier signal")}</tr></thead><tbody>
+  ${page.map(c=>`<tr><td>${starBtn(c)}</td><td><button class="co" data-open="${c.id}">${esc(c.name)}</button><div class="sub">${esc(c.sect)} · ${esc(c.activ)}</div></td>
+   <td class="num">${fmt(c.eff)}</td><td>${toolsCell(c)}</td><td class="num">${contacts.filter(p=>p.cid===c.id).length}</td><td class="sub">${structLine(c)}<br>groupe : ${fmt(c.grpEff)}</td>
+   <td>${scoreCell(c.score)}</td><td class="date">${rel(c.score.last)}</td></tr>`).join("")||`<tr><td colspan="8" class="empty">Aucune entreprise ne correspond.</td></tr>`}
+  </tbody></table></div>`+pager(rows.length);
+}
+function viewPriorites(onlyFollowed){
+  let cos=companies.filter(c=>companyOk(c)&&(!onlyFollowed||S.followed.has(c.id)));
+  cos=[...cos].sort((a,b)=>b.score.total-a.score.total);
+  const page=cos.slice((S.page-1)*S.per,S.page*S.per);
+  const since=S.seen?new Date(S.seen):null;
+  const title=onlyFollowed?"Mes comptes suivis":"Priorités de la semaine";
+  const sub=onlyFollowed?(S.followed.size?`${S.followed.size} comptes suivis · nouveaux signaux depuis votre dernière visite mis en avant`:"Cliquez sur ★ devant une entreprise pour la suivre et recevoir ses nouveaux signaux ici.")
+    :"Classement par score : signaux à fort intérêt, mouvements RH/SIRH/Paie, activité récente, taille et outils concurrents.";
+  if(onlyFollowed&&!S.followed.size)return header(title,sub)+`<div class="tablebox"><div class="empty">Aucun compte suivi pour l'instant.</div></div>`;
+  return header(title,sub)+`<div class="tablebox"><table><thead><tr><th></th><th>Entreprise</th><th>Score</th><th>Pourquoi maintenant</th><th>Outils</th><th>Dernier signal</th></tr></thead><tbody>
+  ${page.map(c=>{const top=signals.filter(s=>s.cid===c.id&&days(s.date)<=90&&((s.theme&&HOT_THEMES.has(s.theme))||(s.fn&&HOT_FAM.has(fnFamily(s.fn))))).slice(0,2);
+    const fresh=since?signals.filter(s=>s.cid===c.id&&s.date>since).length:0;
+    return`<tr><td>${starBtn(c)}</td><td><button class="co" data-open="${c.id}">${esc(c.name)}</button><div class="sub">${esc(c.sect)} · ${fmt(c.eff)} sal.</div>${onlyFollowed&&fresh?`<span class="pill p-arr">${fresh} nouveau${fresh>1?"x":""}</span>`:""}</td>
+    <td>${scoreCell(c.score)}</td><td>${top.map(s=>`<div>${pill(s.type)} <span class="sub">${esc(s.proof)}</span></div>`).join("")||'<span class="sub">Pas de signal fort sur 90 jours</span>'}</td><td>${toolsCell(c)}</td><td class="date">${rel(c.score.last)}</td></tr>`}).join("")}
+  </tbody></table></div>`+pager(cos.length);
+}
+
+/* ---------- Fiche entreprise ---------- */
+function openFiche(id){
+  const c=byCo[id];const people=contacts.filter(p=>p.cid===id);const sigs=signals.filter(s=>s.cid===id);
+  const famGroups={};people.forEach(p=>{(famGroups[fnFamily(p.fn)]=famGroups[fnFamily(p.fn)]||[]).push(p)});
+  const dots=n=>`<span class="dots" aria-label="Confiance ${n} sur 5">${[1,2,3,4,5].map(i=>`<i class="${i<=n?"on":""}"></i>`).join("")}</span>`;
+  drawerRoot.innerHTML=`<div class="scrim" data-close></div><aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+  <div class="dhead"><div><h2 id="dTitle">${esc(c.name)}</h2><div class="sub">${esc(c.activ)} · ${esc(c.sect)}</div></div><button class="btn small" data-close>Fermer</button></div>
+  <div class="actions">${starBtn(c).replace('class="star"','class="btn small star"')}<button class="btn small primary" data-hubspot="${c.id}">Créer dans HubSpot</button><button class="btn small" data-exclude="${c.id}">Exclure du périmètre</button></div>
+  <div class="facts">
+    <div class="fact"><div class="k">Effectif France</div><div class="v num">${fmt(c.eff)}</div></div>
+    <div class="fact"><div class="k">Effectif groupe</div><div class="v num">${fmt(c.grpEff)}</div></div>
+    <div class="fact"><div class="k">Structure</div><div class="v">${structLine(c)}</div></div>
+    <div class="fact"><div class="k">SIREN</div><div class="v num">${c.siren}</div></div>
+  </div>
+  <section><h3>Score de priorité · ${c.score.total}/100</h3><div class="why">${c.score.parts.map(([l,v])=>`<div><span>${l}</span><b class="num">+${v}</b></div>`).join("")}</div></section>
+  <section><h3>Outils en place</h3>${Object.entries(c.tools).map(([cat,list])=>list.map(t=>{const fb=S.toolFeedback[c.id+"|"+t.n];return`<div class="toolrow"><span><span class="sub">${esc(cat)}</span><br><b>${esc(t.n)}</b>${RIVALS.has(t.n)?' <span class="pill p-dep">Concurrent</span>':""}${dots(t.conf)}</span>
+     <span class="actions">${fb?`<span class="sub">${fb==="ok"?"Confirmé par vous":"Signalé comme faux"}</span>`:`<button class="btn small" data-tool="${c.id}|${t.n}|ok">Confirmer</button><button class="btn small" data-tool="${c.id}|${t.n}|ko">Corriger</button>`}</span></div>`}).join("")).join("")||'<p class="sub">Aucun outil identifié.</p>'}</section>
+  <section><h3>Qui appeler · ${people.length}</h3>${Object.entries(famGroups).map(([f,ps])=>`<div class="grp sub" style="margin-top:8px;text-transform:uppercase;letter-spacing:.06em;font-size:11px">${esc(f)}</div>`+ps.map(p=>`<div class="person"><span><b>${esc(p.name)}</b><br><span class="sub">${esc(p.fn)} · depuis ${fmtDate(p.since)}</span></span><span class="mail">${esc(p.mail)}</span></div>`).join("")).join("")}</section>
+  <section><h3>Signaux · ${sigs.length}</h3>${sigs.slice(0,30).map(s=>`<div class="sig"><div>${pill(s.type)} <span class="theme">${esc(s.theme||s.fn)}</span> <span class="date num" style="float:right">${fmtDate(s.date)}</span></div><div>${esc(s.proof)}</div></div>`).join("")||'<p class="sub">Aucun signal.</p>'}</section>
+  </aside>`;
+  drawerRoot.querySelector(".drawer button[data-close]").focus();
+}
+drawerRoot.addEventListener("click",e=>{
+  const t=e.target.closest("[data-close],[data-tool],[data-exclude],[data-hubspot],[data-follow]");if(!t)return;
+  if(t.dataset.close!==undefined){drawerRoot.innerHTML="";return}
+  if(t.dataset.tool){const[id,n,v]=t.dataset.tool.split("|");S.toolFeedback[id+"|"+n]=v;persist();openFiche(id);toast(v==="ok"?"Outil confirmé":"Merci, l'outil est signalé à corriger")}
+  if(t.dataset.exclude){S.excluded.add(t.dataset.exclude);persist();drawerRoot.innerHTML="";render();toast("Compte retiré de votre périmètre")}
+  if(t.dataset.hubspot){toast("Prototype : la synchro HubSpot sera branchée dans la version Claude Code")}
+  if(t.dataset.follow){toggleFollow(t.dataset.follow);openFiche(t.dataset.follow)}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&drawerRoot.innerHTML)drawerRoot.innerHTML=""});
+
+/* ---------- Interactions globales ---------- */
+function toggleFollow(id){S.followed.has(id)?S.followed.delete(id):S.followed.add(id);persist();render()}
+main.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.open)openFiche(b.dataset.open);
+  else if(b.dataset.follow)toggleFollow(b.dataset.follow);
+  else if(b.dataset.type!==undefined){const t=b.dataset.type;if(!t)S.types.clear();else S.types.has(t)?S.types.delete(t):S.types.add(t);S.page=1;render()}
+  else if(b.dataset.page){S.page=+b.dataset.page;render();main.scrollIntoView({block:"start"})}
+  else if(b.dataset.carto){S.carto=b.dataset.carto;S.page=1;S.sort={k:null,dir:-1};render()}
+  else if(b.id==="toggleRail"){S.railOpen=!S.railOpen;render()}
+});
+main.addEventListener("click",e=>{const h=e.target.closest("th[data-sort]");if(!h)return;const k=h.dataset.sort;S.sort=S.sort.k===k?{k,dir:-S.sort.dir}:{k,dir:-1};render()});
+main.addEventListener("submit",e=>{e.preventDefault()});
+let qt;main.addEventListener("input",e=>{if(e.target.id!=="q")return;clearTimeout(qt);qt=setTimeout(()=>{S.q=e.target.value;S.page=1;render();const q=document.getElementById("q");q.focus();q.setSelectionRange(q.value.length,q.value.length)},200)});
+function toast(m){const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
+
+function render(){
+  document.querySelectorAll(".nav a").forEach(a=>{if(a.dataset.view===S.view)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  const fresh=S.seen?signals.filter(s=>S.followed.has(s.cid)&&s.date>new Date(S.seen)).length:0;
+  suivisBadge.hidden=!fresh;suivisBadge.textContent=fresh;
+  renderRail();
+  main.innerHTML=S.view==="signaux"?viewSignaux():S.view==="cartographie"?viewCarto():S.view==="priorites"?viewPriorites(false):viewPriorites(true);
+}
+function route(){const h=location.hash.slice(1);S.view=["signaux","cartographie","priorites","suivis"].includes(h)?h:"signaux";S.page=1;S.sort={k:null,dir:-1};render()}
+window.addEventListener("hashchange",route);
+
+/* ---------- Thèmes en 1 clic ---------- */
+const rootEl=document.documentElement;
+function applySkin(sk){rootEl.dataset.skin=sk;document.querySelectorAll(".skins button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.skin===sk)));store.set("skin",sk)}
+document.querySelector(".skins").addEventListener("click",e=>{const b=e.target.closest("button[data-skin]");if(b)applySkin(b.dataset.skin)});
+modeBtn.addEventListener("click",()=>{const dark=rootEl.dataset.theme?rootEl.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;rootEl.dataset.theme=dark?"light":"dark";store.set("mode",rootEl.dataset.theme)});
+applySkin(store.get("skin","apple"));
+{const m=store.get("mode",null);if(m)rootEl.dataset.theme=m;}
+if(!S.seen)S.seen=new Date(TODAY-14*864e5).toISOString();
+route();
+setTimeout(()=>store.set("seen",S.seen),0);
+</script>
+
+</body></html>

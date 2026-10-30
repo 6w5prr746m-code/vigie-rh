@@ -1,0 +1,143 @@
+// Vigie RH — schéma de données.
+// SQLite en local ; pour Postgres, changer `provider` et DATABASE_URL.
+// Les valeurs « énumérées » sont stockées en String (portables SQLite/Postgres)
+// et validées côté code par les référentiels de src/lib/referentiels.ts.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id                String    @id @default(cuid())
+  siren             String?   @unique
+  name              String
+  nameKey           String // nom normalisé (minuscules, sans accents ni forme juridique) pour le rapprochement
+  nafCode           String?
+  sector            String? // secteur du référentiel SECTEURS
+  activity          String?
+  headcount         Int? // effectif de l'entité (précis, ou bas de tranche INSEE)
+  headcountRange    String? // code tranche INSEE (ex. "42")
+  headcountSource   String? // sirene | hubspot | csv | manuel | demo
+  groupHeadcount    Int?
+  structure         String    @default("indep") // indep | mere | filiale | reseau
+  subsidiariesCount Int       @default(0)
+  parentId          String?
+  parent            Company?  @relation("Groupe", fields: [parentId], references: [id], onDelete: SetNull)
+  children          Company[] @relation("Groupe")
+  foreignGroup      Boolean   @default(false)
+  isPublic          Boolean   @default(false)
+  domain            String?
+  city              String?
+  hubspotId         String?   @unique
+  isCustomer        Boolean   @default(false) // client signé (HubSpot lifecyclestage = customer)
+  isDemo            Boolean   @default(false)
+
+  // Score dénormalisé, recalculé après chaque collecte (tri et pagination côté serveur)
+  scoreTotal   Int       @default(0)
+  scoreParts   String    @default("[]") // JSON : [[libellé, points], …]
+  lastSignalAt DateTime?
+  signalCount  Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contacts Contact[]
+  signals  Signal[]
+  tools    ToolInPlace[]
+  followed Followed?
+  excluded Excluded?
+
+  @@index([nameKey])
+  @@index([scoreTotal])
+  @@index([lastSignalAt])
+  @@index([sector])
+  @@index([headcount])
+}
+
+model Contact {
+  id             String    @id @default(cuid())
+  companyId      String
+  company        Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  firstName      String?
+  lastName       String?
+  fullName       String
+  rawTitle       String? // intitulé tel que reçu de la source
+  function       String? // fonction normalisée (référentiel FONCTIONS)
+  functionFamily String? // famille de fonction
+  since          DateTime? // en poste depuis
+  email          String?
+  source         String // hubspot | csv | demo
+  hubspotId      String?   @unique
+  isDemo         Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([companyId])
+  @@index([function])
+}
+
+model Signal {
+  id             String   @id @default(cuid())
+  companyId      String
+  company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  type           String // ent | dec | job | arr | dep
+  theme          String? // pour ent / dec (référentiel THEMES)
+  function       String? // pour job / arr / dep (référentiel FONCTIONS)
+  functionFamily String?
+  person         String?
+  title          String?
+  summary        String // résumé d'une ligne (« preuve »)
+  url            String?
+  date           DateTime
+  source         String // news | france-travail | hubspot | csv | demo
+  externalId     String?  @unique // dédoublonnage entre collectes
+  isDemo         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  @@index([companyId, date])
+  @@index([date])
+  @@index([type])
+}
+
+model ToolInPlace {
+  id         String    @id @default(cuid())
+  companyId  String
+  company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tool       String
+  category   String // catégorie du référentiel OUTILS
+  confidence Int // 1 à 5
+  mentions   Int       @default(1)
+  source     String // france-travail | csv | manuel | demo
+  feedback   String? // ok | ko (retour utilisateur)
+  feedbackAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([companyId, tool])
+  @@index([tool])
+}
+
+model Followed {
+  companyId String   @id
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Excluded {
+  companyId String   @id
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  reason    String   @default("manuel") // manuel | client-hubspot
+  createdAt DateTime @default(now())
+}
+
+// Réglages clé/valeur (JSON) : poids du score, dernière visite, dernière collecte par source…
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
