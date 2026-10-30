@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import AppBar from "@/components/AppBar";
+import Toaster from "@/components/Toaster";
 import { prisma } from "@/lib/db";
 
 export const metadata: Metadata = { title: "Vigie RH", description: "Veille commerciale SIRH" };
@@ -23,6 +24,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <AppBar hasDemo={demoCount > 0} />
         {children}
+        <Toaster />
       </body>
     </html>
   );

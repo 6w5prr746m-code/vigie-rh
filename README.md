@@ -9,7 +9,7 @@ Le prototype validé `vigie-rh-prototype.html` (à la racine) fait référence p
 | Étape | Contenu | État |
 |---|---|---|
 | 1 | Socle : schéma Prisma, seed de démo, layout, 3 thèmes clair/sombre | ✅ |
-| 2 | Écrans Signaux, Cartographie, fiche entreprise, pagination serveur | à venir |
+| 2 | Écrans Signaux, Cartographie, fiche entreprise, pagination serveur | ✅ |
 | 3 | Connecteur HubSpot (lecture puis écriture) | à venir |
 | 4 | Collecte Sirene, France Travail, actualités + classification Claude | à venir |
 | 5 | Score configurable, Priorités, Comptes suivis, badge « nouveaux » | à venir |
@@ -58,6 +58,14 @@ Le fichier `.env` n'est jamais commité (voir `.gitignore`).
 | `npm run collect` | Collecte des sources (à partir de l'étape 3) |
 | `npm test` | Tests unitaires (Vitest) |
 | `npm run typecheck` / `npm run lint` | Vérifications TypeScript et ESLint |
+
+## Écrans
+
+- **Signaux** (`/signaux`) : filtres période, thèmes, fonctions + périmètre entreprise ; compteurs par type ; tri entreprise / type / date.
+- **Cartographie** (`/cartographie`) : bascule Entreprises / Contacts, filtres ancienneté du dernier signal, outils en place (les outils signalés « faux » sont ignorés), fonctions (vue Contacts).
+- **Fiche entreprise** : tiroir ouvert par `?fiche=<id>` (lien partageable), score détaillé, outils avec confirmation / correction, contacts par famille de fonction, 30 derniers signaux ; suivre, exclure du périmètre.
+
+Les filtres, le tri et la page sont dans l'URL : une vue filtrée se recharge à l'identique. Pagination côté serveur (25, 50 ou 100 lignes via `per`), sans plafond de résultats.
 
 ## Données de démo
 
