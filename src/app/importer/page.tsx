@@ -3,9 +3,10 @@ import ImportWizard from "@/components/ImportWizard";
 import UniverseCard from "@/components/UniverseCard";
 import ExclusionList from "@/components/ExclusionList";
 
-const KIND_LABEL: Record<string, string> = { entreprises: "Entreprises", contacts: "Contacts", exclusions: "Liste d'exclusion", univers: "Univers cible" };
+const KIND_LABEL: Record<string, string> = { entreprises: "Entreprises", contacts: "Contacts", exclusions: "Liste d'exclusion", univers: "Univers cible", "france-travail": "Offres France Travail", news: "Actualités" };
 
 export default async function ImporterPage() {
+  const lastCollect = Object.fromEntries((await prisma.setting.findMany({ where: { key: { startsWith: "lastCollect:" } } })).map((s) => [s.key.slice(12), new Date(JSON.parse(s.value))]));
   const [rules, runs, counts] = await Promise.all([
     prisma.exclusionRule.findMany({ orderBy: { label: "asc" } }),
     prisma.importRun.findMany({ orderBy: { createdAt: "desc" }, take: 15 }),
@@ -39,6 +40,13 @@ export default async function ImporterPage() {
       <aside className="rail" style={{ position: "static", maxHeight: "none" }}>
         <h2>Liste d&apos;exclusion</h2>
         <ExclusionList rules={rules.map((r) => ({ id: r.id, label: r.label, siren: r.siren, matched: (!!r.siren && ms.has(r.siren)) || (!!r.nameKey && mk.has(r.nameKey)) }))} />
+        <h2 style={{ marginTop: 16 }}>Collectes</h2>
+        <div className="sub" style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {([["france-travail", "Offres France Travail"], ["news", "Actualités"]] as const).map(([k, l]) => (
+            <span key={k}>{l} : {lastCollect[k] ? lastCollect[k].toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) : "jamais"}</span>
+          ))}
+          <span>Lancer : <code>npm run collect -- --source=all</code> (voir le README pour la planification).</span>
+        </div>
         <h2 style={{ marginTop: 16 }}>Exporter depuis HubSpot</h2>
         <ol className="sub" style={{ paddingLeft: 18, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
           <li>Entreprises (ou Contacts) → choisissez votre vue (ex. « Mes entreprises »).</li>

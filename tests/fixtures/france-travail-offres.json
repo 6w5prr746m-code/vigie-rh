@@ -1,0 +1,9 @@
+{
+  "resultats": [
+    { "id": "FICT001", "intitule": "Chef de projet SIRH (H/F)", "description": "Au sein de la DRH, vous pilotez le déploiement de Workday. Une connaissance de SAP HR et de Kelio est un plus.", "dateCreation": "2026-10-28T09:00:00.000Z", "lieuTravail": { "libelle": "69 - LYON 03" }, "entreprise": { "nom": "EXEMPLE FICTIF INDUSTRIES" }, "typeContrat": "CDI" },
+    { "id": "FICT002", "intitule": "Gestionnaire de paie (H/F)", "description": "Paie sous Silae, 300 bulletins.", "dateCreation": "2026-10-27T09:00:00.000Z", "lieuTravail": { "libelle": "75 - PARIS 08" }, "entreprise": { "nom": "EXEMPLE FICTIF INDUSTRIES" }, "typeContrat": "CDD" },
+    { "id": "FICT003", "intitule": "Gestionnaire de paie (H/F)", "description": "Pour le compte de notre client, un groupe industriel, nous recherchons…", "dateCreation": "2026-10-27T09:00:00.000Z", "entreprise": { "nom": "Exemple Fictif Logiciels" }, "typeContrat": "MIS" },
+    { "id": "FICT004", "intitule": "Commercial terrain (H/F)", "description": "Vente B2B", "dateCreation": "2026-10-26T09:00:00.000Z", "entreprise": { "nom": "EXEMPLE FICTIF INDUSTRIES" } },
+    { "id": "FICT005", "intitule": "Responsable RH (H/F)", "description": "Environnement ADP.", "dateCreation": "2026-10-25T09:00:00.000Z", "entreprise": { "nom": "Employeur Inconnu Fictif" } }
+  ]
+}

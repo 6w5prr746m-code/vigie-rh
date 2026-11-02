@@ -12,7 +12,7 @@ Le prototype validé `vigie-rh-prototype.html` (à la racine) fait référence p
 | 2 | Écrans Signaux, Cartographie, fiche entreprise, pagination serveur | ✅ |
 | 3a | Mes données sans API : import CSV / Excel (exports HubSpot inclus), liste d'exclusion, saisie | ✅ |
 | 3b | Univers cible (Recherche d'entreprises), ajout par SIREN, export pour l'import HubSpot | ✅ |
-| 4 | Collecte Sirene, France Travail, actualités + classification Claude | à venir |
+| 4 | Collecte France Travail (offres + outils), actualités + classification Claude | ✅ |
 | 5 | Score configurable, Priorités, Comptes suivis, badge « nouveaux » | à venir |
 | 6 | Export Excel des vues filtrées | à venir |
 
@@ -39,9 +39,9 @@ npm run dev               # http://localhost:3000
 | Variable | Usage | Étape |
 |---|---|---|
 | `DATABASE_URL` | Base de données (`file:./dev.db` en local) | 1 |
-| `INSEE_API_KEY` | Clé API Sirene (portail-api.insee.fr) | 4 |
 | `FRANCE_TRAVAIL_CLIENT_ID` / `FRANCE_TRAVAIL_CLIENT_SECRET` | Application francetravail.io, API Offres d'emploi v2 | 4 |
-| `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` | Classification et résumé des actualités (défaut `claude-haiku-5-5`) | 4 |
+| `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` | Classification et résumé des actualités (défaut `claude-haiku-5-5`) ; sans clé, classement par mots-clés | 4 |
+| `NEWS_FEEDS` | Flux RSS additionnels, séparés par des virgules (facultatif) | 4 |
 
 Le fichier `.env` n'est jamais commité (voir `.gitignore`).
 
@@ -58,6 +58,10 @@ Le fichier `.env` n'est jamais commité (voir `.gitignore`).
 | `npm run import -- --kind=entreprises\|contacts\|exclusions --file=…` | Import d'un fichier CSV / XLSX en ligne de commande (`--dry-run` : affiche la correspondance des colonnes ; `--no-create` : n'invente pas d'entreprise pour un contact orphelin) |
 | `npm run collect -- --source=univers --limit=5` | Univers cible : test sur 5 entreprises (`--estimate` : compte seulement ; `--min=1000` ; `--public` pour inclure le public) |
 | `npm run collect -- --source=univers` | Univers cible complet (≥ 1 000 salariés, hors public par défaut) |
+| `npm run collect -- --source=france-travail --limit=5` | Offres d'emploi : test (5 offres enregistrées) ; `--days=7` (1, 3, 7, 14, 31), `--keywords=SIRH,paie` |
+| `npm run collect -- --source=news --limit=3` | Actualités : test sur 3 comptes suivis ; `--top=50` ajoute les 50 meilleurs scores ; `--days=30` |
+| `npm run collect -- --source=all` | France Travail puis actualités, puis recalcul de tous les scores (à planifier) |
+| `npm run collect -- --source=scores` | Recalcule tous les scores |
 | `npm test` | Tests unitaires (Vitest) |
 | `npm run typecheck` / `npm run lint` | Vérifications TypeScript et ESLint |
 
@@ -100,6 +104,34 @@ Bouton **+ Ajouter** (Cartographie) : recherche par nom ou SIREN dans la même A
 
 - **Export HubSpot** (Cartographie) : CSV des entreprises ou contacts de la vue filtrée, en-têtes reconnus par l'assistant d'import HubSpot (Company name, Company Domain Name, Number of Employees, First Name, Email, Job Title…) + colonnes Vigie RH (SIREN, score, derniers signaux) à associer à des propriétés personnalisées ou à ignorer. Données de démo exclues.
 - **Copier pour HubSpot** (fiche) : résumé daté des signaux et outils, à coller en note sur l'entreprise.
+
+## Collecte automatique (étape 4)
+
+### Offres d'emploi — France Travail
+
+1. Créez une application sur [francetravail.io](https://francetravail.io) (espace partenaire), ajoutez-lui l'API **« Offres d'emploi v2 »**, puis copiez l'identifiant et la clé secrète dans `FRANCE_TRAVAIL_CLIENT_ID` / `FRANCE_TRAVAIL_CLIENT_SECRET`.
+2. Test : `npm run collect -- --source=france-travail --limit=5`.
+
+Fonctionnement : recherches par mots-clés (SIRH, HRIS, paie, payroll, GTA, DRH, RRH, ressources humaines, formation, talents) sur les 7 derniers jours ; seules les offres dont l'intitulé correspond à une fonction du référentiel sont gardées. L'API ne fournit pas le SIRET : l'offre est rattachée par **nom d'employeur normalisé**, uniquement s'il correspond à une seule entreprise en base. Les annonces de cabinets ou d'agences « pour le compte d'un client » sont écartées. La commande liste les employeurs non rattachés les plus fréquents, à ajouter via « + Ajouter » si pertinent.
+
+**Outils en place** : les outils du référentiel cités dans l'annonce (Workday, SAP HR, Silae, Kelio…) alimentent la fiche avec la source « france-travail » ; la confiance monte avec le nombre d'offres distinctes qui les citent (1 offre → 2/5, 4 offres et plus → 5/5). Vos confirmations / corrections restent prioritaires.
+
+### Actualités — Google News + Claude
+
+- Périmètre : vos **comptes suivis** (★), plus les N meilleurs scores avec `--top=N`. Comptes exclus et démo ignorés.
+- Un flux Google News par compte (articles des 30 derniers jours citant le nom exact), plus les flux de `NEWS_FEEDS` ; dédoublonnage par lien et par titre.
+- Classification par **Claude Haiku 5.5** (sortie JSON structurée, effort `low`, lots de 15 articles) : pertinence (homonymes écartés), type (actualité entreprise, décideur, arrivée / départ dans une fonction RH-SIRH-Paie-GTA…), thème du référentiel, résumé d'une ligne. Les réponses sont ramenées aux référentiels avant enregistrement.
+- Sans `ANTHROPIC_API_KEY`, un classement par mots-clés prend le relais (résumé = titre).
+
+### Planifier (cron)
+
+Exemple, chaque jour ouvré à 7 h 10 (`crontab -e`, en adaptant le chemin) :
+
+```
+10 7 * * 1-5 cd /chemin/vers/vigie-rh && /usr/bin/env npm run collect -- --source=all >> collect.log 2>&1
+```
+
+Les effectifs proviennent de l'univers cible (tranches INSEE de Recherche d'entreprises) ; une clé API Sirene n'est pas nécessaire.
 
 ## Données de démo
 
